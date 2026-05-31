@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Console Log Sender</title>
+    <style>
+      :root {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #f5f5f5;
+      }
+      .card {
+        width: min(92vw, 480px);
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 1.2rem;
+      }
+      form {
+        display: flex;
+        gap: 8px;
+      }
+      input {
+        flex: 1;
+        min-width: 0;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      button {
+        border: none;
+        border-radius: 8px;
+        padding: 0 14px;
+        background: #111;
+        color: #fff;
+        cursor: pointer;
+      }
+      #status {
+        margin: 10px 0 0;
+        color: #555;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>輸入訊息並發送到後端終端機</h1>
+      <form id="form">
+        <input id="message" type="text" placeholder="輸入要輸出的文字" required />
+        <button type="submit">發送</button>
+      </form>
+      <p id="status" aria-live="polite"></p>
+    </main>
+
+    <script>
+      const form = document.getElementById("form");
+      const messageInput = document.getElementById("message");
+      const status = document.getElementById("status");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const message = messageInput.value.trim();
+
+        if (!message) {
+          status.textContent = "請輸入訊息";
+          return;
+        }
+
+        try {
+          const res = await fetch("/log", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+          });
+
+          if (!res.ok) {
+            throw new Error("送出失敗");
+          }
+
+          status.textContent = "已送出，請查看後端終端機輸出";
+          messageInput.value = "";
+          messageInput.focus();
+        } catch {
+          status.textContent = "送出失敗，請稍後再試";
+        }
+      });
+    </script>
+  </body>
+</html>
