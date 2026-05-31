@@ -2,6 +2,7 @@ const port = Number(process.env.PORT ?? 3000);
 const indexFile = Bun.file(`${import.meta.dir}/public/index.html`);
 
 const server = Bun.serve({
+  hostname: "0.0.0.0",
   port,
   async fetch(req) {
     const url = new URL(req.url);
@@ -34,4 +35,4 @@ const server = Bun.serve({
   }
 });
 
-console.log(`Server is running on http://localhost:${server.port}`);
+console.log(`Server is running on http://0.0.0.0:${server.port}`);
